@@ -70,11 +70,11 @@ int set = 0;
 float freq = 0;
 float rpm = 0;
 float MotorSetRPM = 0;
-int Vmax = 3.3 ;
+int Vmax = 100 ;
 float MotorReadRPM = 0;
 float e =0;
 int error =0;
-float Kp = 0;
+float Kp = 60;
 float u =0;
 int Duty =50;
 
@@ -440,97 +440,109 @@ void HztoRpm()
 }
 void ControlMotor()
 {
-	//e = abs(MotorSetRPM - MotorReadRPM) ;
-//	u = e*Kp;
-//	Duty = (u*100)/Vmax	;
+	e = MotorSetRPM - MotorReadRPM ;
+	//more RPM
+	if (e <= 0){
+//		e = e*-1 ;
+//		u = abs((e*Kp)-100);
+		Duty = 10;
+	}
+	// less RPM
+	else {
+		u = e*Kp;
+		Duty = (u*100)/Vmax	;
+	}
+
+	if(Duty >= 100)
+	{
+		Duty = 100;
+	}
+	else if (Duty <= 0)
+	{
+		Duty = 0;
+	}
+
 
 //	error_integral += error * 0.1;
 //
 //	Duty = 100 + Kp * error;
 
-//	if(Duty >= 100)
-//	{
-//		Duty = 100;
-//	}
-//	else if (Duty <= 0)
-//	{
-//		Duty = 0;
-//	}
 
 
-	error = MotorSetRPM - MotorReadRPM ;
-	if(error <= 5 && error >= 0)
-	{
-		Duty+=1;
-		if(Duty >= 100)
-		{
-			Duty = 100;
-		}
-		else if (Duty <= 0)
-		{
-			Duty = 0;
-		}
-	}
-	else if (error <=10 && error >= 6 )
-	{
-		Duty += 5;
-		if(Duty >= 100)
-		{
-			Duty = 100;
-		}
-		else if (Duty <= 0)
-		{
-			Duty = 0;
-		}
-	}
-	else if (error <= 20 && error >= 11)
-	{
-		Duty+=10;
-		if(Duty >= 100)
-		{
-			Duty = 100;
-		}
-		else if (Duty <= 0)
-		{
-			Duty = 0;
-		}
-	}
-	else if(error >= -5 && error <= 0)
-	{
-		Duty-=1;
-		if(Duty >= 100)
-		{
-			Duty = 100;
-		}
-		else if (Duty <= 0)
-		{
-			Duty = 0;
-		}
-	}
-	else if (error >=-10 && error <= -4 )
-	{
-		Duty -= 5;
-		if(Duty >= 100)
-		{
-			Duty = 100;
-		}
-		else if (Duty <= 0)
-		{
-			Duty = 0;
-		}
-	}
-	else if (error >= -20 && error <= -9)
-	{
-		Duty-=10;
-		if(Duty >= 100)
-		{
-			Duty = 100;
-		}
-		else if (Duty <= 0)
-		{
-			Duty = 0;
-		}
-	}
+//
+//	error = MotorSetRPM - MotorReadRPM ;
+//	if(error <= 5 && error >= 0)
+//	{
+//		Duty+=1;
+//		if(Duty >= 100)
+//		{
+//			Duty = 100;
+//		}
+//		else if (Duty <= 0)
+//		{
+//			Duty = 0;
+//		}
+//	}
+//	else if (error <=10 && error >= 6 )
+//	{
+//		Duty += 5;
+//		if(Duty >= 100)
+//		{
+//			Duty = 100;
+//		}
+//		else if (Duty <= 0)
+//		{
+//			Duty = 0;
+//		}
+//	}
+//	else if (error <= 20 && error >= 11)
+//	{
+//		Duty+=10;
+//		if(Duty >= 100)
+//		{
+//			Duty = 100;
+//		}
+//		else if (Duty <= 0)
+//		{
+//			Duty = 0;
+//		}
+//	}
+//	else if(error >= -5 && error <= 0)
+//	{
+//		Duty-=1;
+//		if(Duty >= 100)
+//		{
+//			Duty = 100;
+//		}
+//		else if (Duty <= 0)
+//		{
+//			Duty = 0;
+//		}
+//	}
+//	else if (error >=-10 && error <= -4 )
+//	{
+//		Duty -= 5;
+//		if(Duty >= 100)
+//		{
+//			Duty = 100;
+//		}
+//		else if (Duty <= 0)
+//		{
+//			Duty = 0;
+//		}
+//	}
+//	else if (error >= -20 && error <= -9)
+//	{
+//		Duty-=10;
+//		if(Duty >= 100)
+//		{
+//			Duty = 100;
+//		}
+//		else if (Duty <= 0)
+//		{
+//			Duty = 0;
+//		}
+//	}
 	//__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,Duty);
 
 }
