@@ -49,6 +49,8 @@ UART_HandleTypeDef huart2;
 uint32_t MotorSetDuty = 50;
 uint32_t InputCaptureBuffer[IC_BUFFER_SIZE];
 float averageRisingedgePeriod;
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -130,7 +132,7 @@ int main(void)
 	  static uint32_t timestamp = 0;
 	  if(HAL_GetTick()>timestamp)
 	  {
-		  timestamp + HAL_GetTick()+50;
+		  timestamp = HAL_GetTick()+500;
 		  averageRisingedgePeriod = IC_Calc_Period();
 		  HztoRpm();
 
@@ -220,9 +222,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 199;
+  htim1.Init.Prescaler = 99;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 99;
+  htim1.Init.Period = 100;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -419,7 +421,7 @@ float IC_Calc_Period()
 {
 	uint32_t currentDMAPointer = IC_BUFFER_SIZE - __HAL_DMA_GET_COUNTER((htim2.hdma[1]));
 	uint32_t lastVaildDMAPointer = (currentDMAPointer-1 + IC_BUFFER_SIZE)%IC_BUFFER_SIZE;
-	uint32_t i = (lastVaildDMAPointer + IC_BUFFER_SIZE-1)% IC_BUFFER_SIZE;
+	uint32_t i = (lastVaildDMAPointer + IC_BUFFER_SIZE-10)% IC_BUFFER_SIZE;
 
 	uint32_t sumdiff = 0;
 	while (i != lastVaildDMAPointer)
@@ -429,7 +431,7 @@ float IC_Calc_Period()
 		sumdiff += NextCapture -firstCapture;
 		i = (i+1)%IC_BUFFER_SIZE;
 	}
-	return sumdiff ;
+	return sumdiff/10 ;
 }
 
 void HztoRpm()
@@ -440,27 +442,27 @@ void HztoRpm()
 }
 void ControlMotor()
 {
-	e = MotorSetRPM - MotorReadRPM ;
-	//more RPM
-	if (e <= 0){
+//	e = MotorSetRPM - MotorReadRPM ;
+//	//more RPM
+//	if (e <= 0){
 //		e = e*-1 ;
 //		u = abs((e*Kp)-100);
-		Duty = 10;
-	}
-	// less RPM
-	else {
-		u = e*Kp;
-		Duty = (u*100)/Vmax	;
-	}
-
-	if(Duty >= 100)
-	{
-		Duty = 100;
-	}
-	else if (Duty <= 0)
-	{
-		Duty = 0;
-	}
+//		Duty = (u*100)/Vmax	;
+//	}
+//	// less RPM
+//	else {
+//		u = e*Kp;
+//		Duty = (u*100)/Vmax	;
+//	}
+//
+//	if(Duty >= 100)
+//	{
+//		Duty = 100;
+//	}
+//	else if (Duty <= 0)
+//	{
+//		Duty = 0;
+//	}
 
 
 //	error_integral += error * 0.1;
@@ -469,81 +471,81 @@ void ControlMotor()
 
 
 
-//
-//	error = MotorSetRPM - MotorReadRPM ;
-//	if(error <= 5 && error >= 0)
-//	{
-//		Duty+=1;
-//		if(Duty >= 100)
-//		{
-//			Duty = 100;
-//		}
-//		else if (Duty <= 0)
-//		{
-//			Duty = 0;
-//		}
-//	}
-//	else if (error <=10 && error >= 6 )
-//	{
-//		Duty += 5;
-//		if(Duty >= 100)
-//		{
-//			Duty = 100;
-//		}
-//		else if (Duty <= 0)
-//		{
-//			Duty = 0;
-//		}
-//	}
-//	else if (error <= 20 && error >= 11)
-//	{
-//		Duty+=10;
-//		if(Duty >= 100)
-//		{
-//			Duty = 100;
-//		}
-//		else if (Duty <= 0)
-//		{
-//			Duty = 0;
-//		}
-//	}
-//	else if(error >= -5 && error <= 0)
-//	{
-//		Duty-=1;
-//		if(Duty >= 100)
-//		{
-//			Duty = 100;
-//		}
-//		else if (Duty <= 0)
-//		{
-//			Duty = 0;
-//		}
-//	}
-//	else if (error >=-10 && error <= -4 )
-//	{
-//		Duty -= 5;
-//		if(Duty >= 100)
-//		{
-//			Duty = 100;
-//		}
-//		else if (Duty <= 0)
-//		{
-//			Duty = 0;
-//		}
-//	}
-//	else if (error >= -20 && error <= -9)
-//	{
-//		Duty-=10;
-//		if(Duty >= 100)
-//		{
-//			Duty = 100;
-//		}
-//		else if (Duty <= 0)
-//		{
-//			Duty = 0;
-//		}
-//	}
-	//__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,Duty);
+
+	error = MotorSetRPM - MotorReadRPM ;
+	if(error <= 5 && error >= 0)
+	{
+		Duty+=1;
+		if(Duty >= 100)
+		{
+			Duty = 100;
+		}
+		else if (Duty <= 0)
+		{
+			Duty = 0;
+		}
+	}
+	else if (error <=10 && error >= 6 )
+	{
+		Duty += 5;
+		if(Duty >= 100)
+		{
+			Duty = 100;
+		}
+		else if (Duty <= 0)
+		{
+			Duty = 0;
+		}
+	}
+	else if (error <= 20 && error >= 11)
+	{
+		Duty+=10;
+		if(Duty >= 100)
+		{
+			Duty = 100;
+		}
+		else if (Duty <= 0)
+		{
+			Duty = 0;
+		}
+	}
+	else if(error >= -5 && error <= 0)
+	{
+		Duty-=1;
+		if(Duty >= 100)
+		{
+			Duty = 100;
+		}
+		else if (Duty <= 0)
+		{
+			Duty = 0;
+		}
+	}
+	else if (error >=-10 && error <= -4 )
+	{
+		Duty -= 5;
+		if(Duty >= 100)
+		{
+			Duty = 100;
+		}
+		else if (Duty <= 0)
+		{
+			Duty = 0;
+		}
+	}
+	else if (error >= -20 && error <= -9)
+	{
+		Duty-=10;
+		if(Duty >= 100)
+		{
+			Duty = 100;
+		}
+		else if (Duty <= 0)
+		{
+			Duty = 0;
+		}
+	}
+//	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,Duty);
 
 }
 
